@@ -1,5 +1,6 @@
 import sys
 import time
+
 import socketio
 import redis
 
@@ -26,6 +27,7 @@ class PrintObserver(CardObserver):
         for card in added_cards:
             print("+Inserted: ", toHexString(card.atr))
             sio.emit('nfc_data', {'data': toHexString(card.atr)})
+
 
 def main():
 
