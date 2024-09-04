@@ -5,6 +5,7 @@ import socketio
 import redis
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
+from smartcard.System import readers
 from smartcard.util import toHexString
 
 r = redis.Redis(host='localhost', port=6379, db=0)
@@ -25,9 +26,22 @@ class PrintObserver(CardObserver):
     def update(self, observable, actions):
         (added_cards, removed_cards) = actions
         for card in added_cards:
-            print("+Inserted: ", toHexString(card.atr))
-            sio.emit('nfc_data', {'data': toHexString(card.atr)})
 
+            reader = readers()[0]
+            connection = reader.createConnection()
+            connection.connect()
+
+            # GET DATA APDU 명령어
+            get_uid = [0xFF, 0xCA, 0x00, 0x00, 0x00]
+
+            # 명령어 전송
+            response, sw1, sw2 = connection.transmit(get_uid)
+
+            # UID 확인
+            if sw1 == 0x90 and sw2 == 0x00:
+                uid = toHexString(response)
+                sio.emit('nfc_data', {'data': uid})
+                print(f"+Inserted: {uid}")
 
 def main():
 
