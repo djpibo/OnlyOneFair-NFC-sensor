@@ -43,6 +43,8 @@ class PrintObserver(CardObserver):
                 sio.emit('nfc_data', {'data': uid})
                 print(f"+Inserted: {uid}")
 
+            connection.disconnect()
+
 def main():
 
     if len(sys.argv) == 3: # 각 클래스 입장
