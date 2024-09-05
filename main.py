@@ -39,7 +39,7 @@ class PrintObserver(CardObserver):
 
             # UID 확인
             if sw1 == 0x90 and sw2 == 0x00:
-                uid = toHexString(response)
+                uid = toHexString(response).replace(' ', ':')
                 sio.emit('nfc_data', {'data': uid})
                 print(f"+Inserted: {uid}")
 
