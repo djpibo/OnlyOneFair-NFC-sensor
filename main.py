@@ -1,17 +1,23 @@
 import sys
 import time
 
+import smartcard
 import socketio
 import redis
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
+from smartcard.Exceptions import CardConnectionException
 from smartcard.System import readers
 from smartcard.util import toHexString
+from socketio import exceptions
+from memory_profiler import profile
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 sio = socketio.Client()
 sio.connect('http://localhost:5000', transports=['websocket'])
+
+flag = False
 
 @sio.event
 def connect():
@@ -23,14 +29,14 @@ def disconnect():
 
 
 class PrintObserver(CardObserver):
+
+    @profile
     def update(self, observable, actions):
         (added_cards, removed_cards) = actions
         for card in added_cards:
-
             reader = readers()[0]
             connection = reader.createConnection()
             connection.connect()
-
             # GET DATA APDU 명령어
             get_uid = [0xFF, 0xCA, 0x00, 0x00, 0x00]
 
@@ -46,7 +52,6 @@ class PrintObserver(CardObserver):
             connection.disconnect()
 
 def main():
-
     if len(sys.argv) == 3: # 각 클래스 입장
 
         r.set('company', sys.argv[1].encode('utf-8'))
