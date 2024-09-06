@@ -6,10 +6,8 @@ import socketio
 import redis
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
-from smartcard.Exceptions import CardConnectionException
 from smartcard.System import readers
 from smartcard.util import toHexString
-from socketio import exceptions
 from memory_profiler import profile
 
 r = redis.Redis(host='localhost', port=6379, db=0)
