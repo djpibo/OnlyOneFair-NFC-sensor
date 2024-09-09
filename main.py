@@ -1,15 +1,11 @@
 import sys
 import time
-
-import smartcard
 import socketio
 import redis
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.System import readers
 from smartcard.util import toHexString
-from memory_profiler import profile
-
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 sio = socketio.Client()
@@ -28,7 +24,6 @@ def disconnect():
 
 class PrintObserver(CardObserver):
 
-    @profile
     def update(self, observable, actions):
         (added_cards, removed_cards) = actions
         for card in added_cards:
